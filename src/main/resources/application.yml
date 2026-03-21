@@ -1,0 +1,23 @@
+logging:
+  config: 'classpath:log4j2.yml'
+
+spring:
+  application:
+    name: hack-spring2026-api
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://hack2026-db:5432/hack
+    username: hack_user
+    password: hack_passwd
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api/docs
+  swagger-ui:
+    csrf:
+      enabled: true
+    path: /api/swagger
+
+server:
+  port: 33300

@@ -1,0 +1,39 @@
+services:
+  hack2026-db:
+    image: postgres:16.3
+    container_name: hack2026-db
+    hostname: hack2026-db
+    restart: always
+    environment:
+      POSTGRES_DB: "hack"
+      POSTGRES_USER: "hack_user"
+      POSTGRES_PASSWORD: "hack_passwd"
+    volumes:
+      - /home/kinoko/postgresql/hack2026-db:/var/lib/postgresql/data
+    networks:
+      - backend
+    ports:
+      - "8801:5432"
+
+  hack2026:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    restart: always
+    depends_on:
+      - hack2026-db
+    image: hack-spring2026-api
+    container_name: hack-spring2026-api
+    environment:
+      - TZ=Europe/Moscow
+      - JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Moscow
+    volumes:
+      - /home/kinoko/logs/hack-spring2026-api:/logs
+    networks:
+      - backend
+    ports:
+      - "8800:8800"
+
+networks:
+  backend:
+    external: true
