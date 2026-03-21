@@ -1,18 +1,13 @@
 package ru.sonso.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import ru.sonso.enumerable.AdminRole
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "admins")
@@ -47,7 +42,7 @@ data class AdminEntity(
 
     @field:Column(name = "updated_at", nullable = false)
     var updatedAt: OffsetDateTime = OffsetDateTime.now()
-) {
+): UserDetails {
     constructor() : this(
         id = null,
         firstName = "",
@@ -59,4 +54,8 @@ data class AdminEntity(
         createdAt = OffsetDateTime.now(),
         updatedAt = OffsetDateTime.now()
     )
+
+    override fun getUsername() = this.email
+    override fun getPassword() = this.passwordHash
+    override fun getAuthorities() = mutableListOf(SimpleGrantedAuthority(role.toString()))
 }
