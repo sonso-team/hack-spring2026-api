@@ -8,5 +8,5 @@ import ru.sonso.dto.Snapshot
 data class FinishGameRequest(
     val sessionToken: String,
     val finalScore: Int,
-    val snapshots: List<Snapshot>,
+    val snapshots: List<Snapshot>
 )
