@@ -14,7 +14,7 @@ fun LobbyStatus.toApiValue(): String = name.lowercase()
 fun SessionStatus.toApiValue(): String = when (this) {
     SessionStatus.STARTED -> "started"
     SessionStatus.COMPLETED -> "completed"
-    SessionStatus.SUSPICIOUS -> "suspicious"
+    SessionStatus.SUSPICIOUS -> "completed"
 }
 
 fun String.toLobbyDifficulty(): LobbyDifficulty {

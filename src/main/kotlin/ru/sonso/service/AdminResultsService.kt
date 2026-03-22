@@ -78,7 +78,7 @@ class AdminResultsService(
         val rows = fetchRowsForLobby(
             lobbyId = requireLobbyId(lobby),
             search = null,
-            allowedStatuses = setOf(SessionStatus.COMPLETED),
+            allowedStatuses = setOf(SessionStatus.COMPLETED, SessionStatus.SUSPICIOUS),
         )
         if (rows.isEmpty()) {
             throw NoSuchElementException("No completed results found")

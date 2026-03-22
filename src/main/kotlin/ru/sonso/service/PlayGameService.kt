@@ -95,7 +95,11 @@ class PlayGameService(
         session.finishedAt = finishedAt
         session.durationSeconds = Duration.between(session.startedAt, finishedAt).seconds.toInt().coerceAtLeast(0)
         session.finalScore = request.finalScore
-        session.status = if (suspicious) SessionStatus.SUSPICIOUS else SessionStatus.COMPLETED
+        session.status = SessionStatus.COMPLETED
+
+        if (suspicious) {
+            logger.warn("Suspicious game session detected, sessionId={}", session.id)
+        }
 
         val savedSession = gameSessionRepository.save(session)
         playersInGameWsService.publishCurrentPlayersInGame()
