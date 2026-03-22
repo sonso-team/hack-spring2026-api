@@ -27,6 +27,11 @@ services:
     environment:
       - TZ=Europe/Moscow
       - JAVA_TOOL_OPTIONS=-Duser.timezone=Europe/Moscow
+      - APP_SUPERADMIN_FIRST_NAME=Super
+      - APP_SUPERADMIN_LAST_NAME=Admin
+      - APP_SUPERADMIN_POSITION=System Administrator
+      - APP_SUPERADMIN_EMAIL=superadmin@example.com
+      - APP_SUPERADMIN_PASSWORD=change-me-please
     volumes:
       - /home/kinoko/logs/hack-spring2026-api:/logs
     networks:
