@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import ru.sonso.dto.Snapshot
 import ru.sonso.dto.request.FinishGameRequest
 import ru.sonso.dto.request.StartGameRequest
 import ru.sonso.dto.response.FinishGameResponse
@@ -21,7 +20,7 @@ import ru.sonso.repository.LobbyRepository
 import ru.sonso.repository.PlayerRepository
 import java.time.Duration
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 import kotlin.math.abs
 
 @Service
@@ -88,7 +87,6 @@ class PlayGameService(
             .orElseThrow { NoSuchElementException("Lobby not found") }
 
         val suspicious = detectSuspiciousSession(
-            request = request,
             session = session,
             expectedDurationSeconds = lobby.durationMinutes * 60,
         )
@@ -111,15 +109,9 @@ class PlayGameService(
     }
 
     private fun detectSuspiciousSession(
-        request: FinishGameRequest,
         session: GameSessionEntity,
         expectedDurationSeconds: Int,
     ): Boolean {
-        val snapshots = request.snapshots
-        if (snapshots.any { it.score < 0 || it.kills < 0 }) {
-            throw IllegalArgumentException("Snapshots contain negative values")
-        }
-
         var suspicious = false
 
         val actualDurationSeconds = Duration.between(session.startedAt, OffsetDateTime.now())
@@ -130,38 +122,7 @@ class PlayGameService(
             suspicious = true
         }
 
-        suspicious = suspicious || !areSnapshotsChronologicalAndTimed(snapshots)
-        suspicious = suspicious || !isScoreProgressValid(snapshots)
-
-        if (snapshots.last().score != request.finalScore) {
-            suspicious = true
-        }
-
         return suspicious
-    }
-
-    private fun areSnapshotsChronologicalAndTimed(snapshots: List<Snapshot>): Boolean {
-        if (snapshots.size < 2) return true
-        for (index in 1 until snapshots.size) {
-            val previous = snapshots[index - 1]
-            val current = snapshots[index]
-            val diff = current.timestamp - previous.timestamp
-            if (diff <= 0L) return false
-            if (diff !in 3000L..5000L) return false
-        }
-        return true
-    }
-
-    private fun isScoreProgressValid(snapshots: List<Snapshot>): Boolean {
-        if (snapshots.size < 2) return true
-        for (index in 1 until snapshots.size) {
-            val previousScore = snapshots[index - 1].score
-            val currentScore = snapshots[index].score
-            val diff = currentScore - previousScore
-            if (diff < 0) return false
-            if (diff > 500) return false
-        }
-        return true
     }
 
     private fun calculateRank(session: GameSessionEntity): Int {
