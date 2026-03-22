@@ -7,6 +7,5 @@ import ru.sonso.dto.Snapshot
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class FinishGameRequest(
     val sessionToken: String,
-    val finalScore: Int,
-    val snapshots: List<Snapshot>
+    val finalScore: Int
 )
