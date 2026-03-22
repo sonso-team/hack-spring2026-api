@@ -66,7 +66,7 @@ class PlayGameService(
 
         return StartGameResponse(
             sessionToken = session.sessionToken,
-            difficulty = lobby.difficulty?.toApiValue(),
+            difficulty = lobby.difficulty.toApiValue(),
             durationSeconds = lobby.durationMinutes * 60,
         ).also { logger.info("Game session started, token={}", session.sessionToken.take(8)) }
     }

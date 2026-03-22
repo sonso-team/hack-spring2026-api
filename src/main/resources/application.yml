@@ -15,6 +15,12 @@ app:
     secret: a45933b42fc4f16f67902829ab2c259205f3080e672c1695beee0f68b915c579fedc4b37737062bd
     access-life-time: 900000
     refresh-life-time: 2592000000
+  superadmin:
+    first-name: ${APP_SUPERADMIN_FIRST_NAME:Super}
+    last-name: ${APP_SUPERADMIN_LAST_NAME:Admin}
+    position: ${APP_SUPERADMIN_POSITION:System Administrator}
+    email: ${APP_SUPERADMIN_EMAIL:superadmin@example.com}
+    password: ${APP_SUPERADMIN_PASSWORD:change-me-please}
 
 springdoc:
   api-docs:

@@ -4,10 +4,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import ru.sonso.properties.AuthenticationProperties
+import ru.sonso.properties.SuperadminProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties(
-    AuthenticationProperties::class
+    AuthenticationProperties::class,
+    SuperadminProperties::class,
 )
 class Hack2026Application
 
