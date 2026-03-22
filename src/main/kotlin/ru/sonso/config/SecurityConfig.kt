@@ -65,6 +65,7 @@ class SecurityConfig(
                 it.requestMatchers(
                     "/api/auth/login",
                     "/api/play/**",
+                    "/ws/**",
                     "/api/swagger",
                     "/api/swagger/**",
                     "/api/docs",

@@ -29,6 +29,7 @@ class PlayGameService(
     private val playerRepository: PlayerRepository,
     private val lobbyRepository: LobbyRepository,
     private val gameSessionRepository: GameSessionRepository,
+    private val playersInGameWsService: PlayersInGameWsService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -63,6 +64,7 @@ class PlayGameService(
                 status = SessionStatus.STARTED,
             )
         )
+        playersInGameWsService.publishCurrentPlayersInGame()
 
         return StartGameResponse(
             sessionToken = session.sessionToken,
@@ -99,6 +101,7 @@ class PlayGameService(
         session.status = if (suspicious) SessionStatus.SUSPICIOUS else SessionStatus.COMPLETED
 
         val savedSession = gameSessionRepository.save(session)
+        playersInGameWsService.publishCurrentPlayersInGame()
         val rank = calculateRank(savedSession)
 
         return FinishGameResponse(

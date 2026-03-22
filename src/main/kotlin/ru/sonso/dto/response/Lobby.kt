@@ -17,6 +17,7 @@ data class Lobby(
     val status: String,
     val inviteCode: String,
     val playersCount: Int,
+    val onlinePlayersCount: Int,
     val createdAt: OffsetDateTime,
     val closedAt: OffsetDateTime?,
 )
