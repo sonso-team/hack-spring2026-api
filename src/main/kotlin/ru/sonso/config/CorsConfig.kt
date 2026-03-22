@@ -14,7 +14,7 @@ class CorsConfig {
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         configuration.applyPermitDefaultValues() // Включает стандартные разрешения
-        configuration.allowedOrigins = listOf("http://localhost:5173", "https://bank.kinoko.su") // Разрешить запросы с localhost и uwu-devcrew.ru
+        configuration.allowedOrigins = listOf("http://localhost:5173", "https://hack.kinoko.su") // Разрешить запросы с localhost и hack.kinoko.su
         configuration.allowedMethods = listOf("*") // Разрешить любые методы (GET, POST, и т.д.)
         configuration.allowedHeaders = listOf("*") // Разрешить любые заголовки
         configuration.allowCredentials = true // Разрешить учетные данные (по необходимости)

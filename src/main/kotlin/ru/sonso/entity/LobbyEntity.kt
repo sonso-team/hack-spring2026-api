@@ -32,7 +32,7 @@ data class LobbyEntity(
     @field:Enumerated(EnumType.STRING)
     @field:JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @field:Column(name = "difficulty", columnDefinition = "LOBBY_DIFFICULTY")
-    var difficulty: LobbyDifficulty? = null,
+    var difficulty: LobbyDifficulty = LobbyDifficulty.MEDIUM,
 
     @field:Column(name = "duration_minutes", nullable = false)
     var durationMinutes: Int = 0,
@@ -61,7 +61,7 @@ data class LobbyEntity(
         id = null,
         name = "",
         game = "",
-        difficulty = null,
+        difficulty = LobbyDifficulty.MEDIUM,
         durationMinutes = 0,
         maxAttempts = 0,
         gameOverText = "",

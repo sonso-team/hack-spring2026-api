@@ -2,24 +2,24 @@ package ru.sonso.util
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.security.core.AuthenticationException
-import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
 
 @Component
-class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
-    override fun commence(
+class CustomAccessDeniedHandler : AccessDeniedHandler {
+    override fun handle(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        authException: AuthenticationException,
+        accessDeniedException: AccessDeniedException,
     ) {
-        response.status = HttpServletResponse.SC_UNAUTHORIZED
+        response.status = HttpServletResponse.SC_FORBIDDEN
         response.contentType = "application/json"
         response.writer.write(
             """
             {
-              "error": "Unauthorized",
-              "message": "Authentication is required"
+              "error": "Forbidden",
+              "message": "Access denied"
             }
             """.trimIndent()
         )

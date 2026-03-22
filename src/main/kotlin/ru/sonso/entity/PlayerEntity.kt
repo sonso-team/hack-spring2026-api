@@ -18,7 +18,7 @@ data class PlayerEntity(
     var id: UUID? = null,
 
     @field:Column(name = "lobby_id", nullable = false)
-    var lobbyId: Long = 0,
+    var lobbyId: UUID = UUID(0L, 0L),
 
     @field:Column(name = "first_name", nullable = false, length = 100)
     var firstName: String = "",
@@ -37,7 +37,7 @@ data class PlayerEntity(
 ) {
     constructor() : this(
         id = null,
-        lobbyId = 0,
+        lobbyId = UUID(0L, 0L),
         firstName = "",
         lastName = "",
         phone = "",

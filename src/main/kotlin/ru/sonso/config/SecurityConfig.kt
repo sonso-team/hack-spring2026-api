@@ -10,38 +10,38 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import ru.sonso.exception.UserNotFoundException
-import ru.sonso.repository.UserRepository
+import ru.sonso.repository.AdminRepository
 import ru.sonso.service.JwtService
+import ru.sonso.util.CustomAccessDeniedHandler
 import ru.sonso.util.CustomAuthenticationEntryPoint
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig (
-    private val userRepository: UserRepository,
+class SecurityConfig(
+    private val adminRepository: AdminRepository,
     private val jwtService: JwtService,
     private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
+    private val customAccessDeniedHandler: CustomAccessDeniedHandler,
 ) {
+    @Bean
+    fun userDetailsService(): UserDetailsService = UserDetailsService { email ->
+        adminRepository.findByEmailIgnoreCase(email)
+            ?: throw UsernameNotFoundException("Invalid email or password")
+    }
 
     @Bean
-    fun userDetailsService(): UserDetailsService? {
-        return UserDetailsService { login: String ->
-            userRepository.findByEmail(login)
-                ?: throw UserNotFoundException("Неверные логин или пароль")
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+
+    @Bean
+    fun authenticationProvider(userDetailsService: UserDetailsService): AuthenticationProvider =
+        DaoAuthenticationProvider(userDetailsService).apply {
+            setPasswordEncoder(passwordEncoder())
         }
-    }
-
-    @Bean
-    fun passwordEncoder() = BCryptPasswordEncoder()
-
-    @Bean
-    fun authenticationProvider(): AuthenticationProvider = DaoAuthenticationProvider().apply {
-        setUserDetailsService(userDetailsService())
-        setPasswordEncoder(passwordEncoder())
-    }
 
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager =
@@ -49,33 +49,35 @@ class SecurityConfig (
 
     @Bean
     fun securityFilterChain(http: HttpSecurity, userDetailsService: UserDetailsService): SecurityFilterChain {
-        http.cors { }
+        http
+            .cors {}
             .csrf { it.disable() }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .addFilterBefore(
                 JwtAuthenticationFilter(userDetailsService, jwtService),
                 UsernamePasswordAuthenticationFilter::class.java,
             )
-            .authorizeHttpRequests { authorizationManagerRequestMatcherRegistry ->
-                authorizationManagerRequestMatcherRegistry
-                    .requestMatchers(
-                        "/api/auth/authorization",
-                        "/api/auth/registration",
-                        "/api/auth/refresh",
-                        "/api/auth/logout",
-                        "/swagger-ui/*",
-                        "/v3/api-docs",
-                        "/v3/api-docs/*"
-                    )
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated()
+            .exceptionHandling {
+                it.authenticationEntryPoint(customAuthenticationEntryPoint)
+                it.accessDeniedHandler(customAccessDeniedHandler)
             }
-            .exceptionHandling { exceptionHandlingConfigurer ->
+            .authorizeHttpRequests {
+                it.requestMatchers(
+                    "/api/auth/login",
+                    "/api/play/**",
+                    "/api/swagger",
+                    "/api/swagger/**",
+                    "/api/docs",
+                    "/api/docs/**",
+                    "/v3/api-docs",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                ).permitAll()
+                    .requestMatchers("/api/admin/admins", "/api/admin/admins/**").hasAuthority("SUPERADMIN")
+                    .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPERADMIN")
+                    .anyRequest().permitAll()
+            }
 
-                exceptionHandlingConfigurer
-                    .authenticationEntryPoint(customAuthenticationEntryPoint)
-            }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         return http.build()
     }
 }

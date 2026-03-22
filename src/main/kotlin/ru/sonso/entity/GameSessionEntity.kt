@@ -12,6 +12,7 @@ import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import ru.sonso.enumerable.SessionStatus
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @Entity
 @Table(name = "game_sessions")
@@ -22,10 +23,10 @@ data class GameSessionEntity(
     var id: Long? = null,
 
     @field:Column(name = "player_id", nullable = false)
-    var playerId: Long = 0,
+    var playerId: UUID = UUID(0L, 0L),
 
     @field:Column(name = "lobby_id", nullable = false)
-    var lobbyId: Long = 0,
+    var lobbyId: UUID = UUID(0L, 0L),
 
     @field:Column(name = "attempt_no", nullable = false)
     var attemptNo: Int = 0,
@@ -52,8 +53,8 @@ data class GameSessionEntity(
 ) {
     constructor() : this(
         id = null,
-        playerId = 0,
-        lobbyId = 0,
+        playerId = UUID(0L, 0L),
+        lobbyId = UUID(0L, 0L),
         attemptNo = 0,
         sessionToken = "",
         startedAt = OffsetDateTime.now(),

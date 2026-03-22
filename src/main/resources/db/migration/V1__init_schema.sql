@@ -31,7 +31,7 @@ CREATE TABLE lobbies (
 
 CREATE TABLE players (
     id uuid PRIMARY KEY,
-    lobby_id BIGINT NOT NULL REFERENCES lobbies(id) ON DELETE CASCADE,
+    lobby_id UUID NOT NULL REFERENCES lobbies(id) ON DELETE CASCADE,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(32) NOT NULL,
@@ -43,8 +43,8 @@ CREATE TABLE players (
 
 CREATE TABLE game_sessions (
     id BIGSERIAL PRIMARY KEY,
-    player_id BIGINT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
-    lobby_id BIGINT NOT NULL REFERENCES lobbies(id) ON DELETE CASCADE,
+    player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+    lobby_id UUID NOT NULL REFERENCES lobbies(id) ON DELETE CASCADE,
     attempt_no INTEGER NOT NULL,
     session_token VARCHAR(128) NOT NULL,
     started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

@@ -10,6 +10,12 @@ spring:
     username: hack_user
     password: hack_passwd
 
+app:
+  auth:
+    secret: a45933b42fc4f16f67902829ab2c259205f3080e672c1695beee0f68b915c579fedc4b37737062bd
+    access-life-time: 900000
+    refresh-life-time: 2592000000
+
 springdoc:
   api-docs:
     enabled: true
