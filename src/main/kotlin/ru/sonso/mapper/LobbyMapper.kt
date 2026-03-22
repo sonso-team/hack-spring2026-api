@@ -19,7 +19,7 @@ fun CreateLobbyRequest.toLobbyEntity(inviteCode: String): LobbyEntity = LobbyEnt
     closedAt = null,
 )
 
-fun LobbyEntity.toLobby(playersCount: Int): Lobby = Lobby(
+fun LobbyEntity.toLobby(playersCount: Int, onlinePlayersCount: Int): Lobby = Lobby(
     id = checkNotNull(id) { "Lobby id is missing" },
     name = name,
     game = game,
@@ -30,6 +30,7 @@ fun LobbyEntity.toLobby(playersCount: Int): Lobby = Lobby(
     status = status.toApiValue(),
     inviteCode = inviteCode,
     playersCount = playersCount,
+    onlinePlayersCount = onlinePlayersCount,
     createdAt = createdAt,
     closedAt = closedAt,
 )

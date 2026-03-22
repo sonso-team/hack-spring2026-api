@@ -21,6 +21,7 @@ import java.util.UUID
 class AdminLobbyService(
     private val lobbyRepository: LobbyRepository,
     private val playerRepository: PlayerRepository,
+    private val playersInGameWsService: PlayersInGameWsService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -29,7 +30,10 @@ class AdminLobbyService(
         logger.info("Fetching active lobby")
         val lobby = lobbyRepository.findFirstByStatusOrderByCreatedAtDesc(LobbyStatus.ACTIVE)
             ?: throw NoSuchElementException("Active lobby not found")
-        return lobby.toLobby(playersCount = playerRepository.countByLobbyId(requireLobbyId(lobby)).toInt())
+        return lobby.toLobby(
+            playersCount = playerRepository.countByLobbyId(requireLobbyId(lobby)).toInt(),
+            onlinePlayersCount = playersInGameWsService.getConnectedClientsCount(),
+        )
             .also { logger.info("Active lobby fetched, id={}", it.id) }
     }
 
@@ -43,7 +47,11 @@ class AdminLobbyService(
         }
 
         val savedLobby = lobbyRepository.save(request.toLobbyEntity(inviteCode = generateUniqueInviteCode()))
-        return savedLobby.toLobby(playersCount = 0)
+        playersInGameWsService.onLobbyActivated()
+        return savedLobby.toLobby(
+            playersCount = 0,
+            onlinePlayersCount = playersInGameWsService.getConnectedClientsCount(),
+        )
             .also { logger.info("Lobby created, id={}", it.id) }
     }
 
@@ -53,6 +61,7 @@ class AdminLobbyService(
         val activeLobby = lobbyRepository.findFirstByStatusOrderByCreatedAtDesc(LobbyStatus.ACTIVE)
         if (activeLobby != null) {
             lobbyRepository.delete(activeLobby)
+            playersInGameWsService.onLobbyDeactivated()
             logger.info("Active lobby deleted, id={}", activeLobby.id)
             return SuccessResponse(success = true)
         }
@@ -83,7 +92,14 @@ class AdminLobbyService(
         }
 
         val saved = lobbyRepository.save(updated)
-        return saved.toLobby(playersCount = playerRepository.countByLobbyId(requireLobbyId(saved)).toInt())
+        when (saved.status) {
+            LobbyStatus.ACTIVE -> playersInGameWsService.onLobbyActivated()
+            LobbyStatus.CLOSED -> playersInGameWsService.onLobbyDeactivated()
+        }
+        return saved.toLobby(
+            playersCount = playerRepository.countByLobbyId(requireLobbyId(saved)).toInt(),
+            onlinePlayersCount = playersInGameWsService.getConnectedClientsCount(),
+        )
             .also { logger.info("Lobby status toggled, id={}, status={}", it.id, it.status) }
     }
 
