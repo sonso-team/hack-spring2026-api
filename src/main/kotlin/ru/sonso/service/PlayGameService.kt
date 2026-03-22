@@ -77,7 +77,6 @@ class PlayGameService(
     fun finish(request: FinishGameRequest): FinishGameResponse {
         logger.info("Finishing game session")
         if (request.finalScore < 0) throw IllegalArgumentException("final_score must be >= 0")
-        if (request.snapshots.isEmpty()) throw IllegalArgumentException("snapshots must not be empty")
 
         val session = gameSessionRepository.findBySessionToken(request.sessionToken.trim())
             ?: throw NoSuchElementException("Session not found")
